@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Emod - Sifat dan Kehidupan</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .emoji {
+            font-size: 100px;
+            margin-bottom: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        .emoji:hover {
+            transform: scale(1.2);
+        }
+
+        .question {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .answer-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+
+        .answer-btn:hover {
+            background-color: #d5005c;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .reset-btn:hover {
+            background-color: #45a049;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="emoji" id="emoji">😊</div>
+        <div class="question" id="question">Klik tombol untuk memulai permainan!</div>
+        <div id="answers"></div>
+        <button class="answer-btn" onclick="askQuestion()">Mulai Pertanyaan</button>
+        <div class="result" id="result"></div>
+        <div class="button-container">
+            <button class="reset-btn" id="reset-btn" onclick="resetGame()" style="display:none;">Ulangi Game</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Apa yang kamu pilih saat merasa lelah?",
+                emoji: "😴",
+                answers: ["Tidur", "Berjalan-jalan", "Menonton Film"],
+                result: [
+                    "Kamu adalah seseorang yang butuh istirahat dan ketenangan. Kamu suka menyendiri untuk mengisi energi kembali.",
+                    "Kamu adalah orang yang suka petualangan dan sering mencari cara untuk menenangkan pikiran dengan cara berbeda.",
+                    "Kamu adalah orang yang sangat menikmati hiburan dan bisa dengan cepat melupakan kelelahan dengan cara yang menyenangkan."
+                ]
+            },
+            {
+                question: "Apa yang kamu lakukan saat menghadapi masalah besar?",
+                emoji: "🤔",
+                answers: ["Mencari solusi sendiri", "Minta bantuan teman", "Menghindar dari masalah"],
+                result: [
+                    "Kamu adalah seseorang yang mandiri dan lebih suka menyelesaikan masalah dengan kekuatan sendiri.",
+                    "Kamu menghargai dukungan orang lain dan percaya bahwa bersama-sama bisa menyelesaikan masalah lebih mudah.",
+                    "Kamu cenderung menghindari masalah, namun tahu kapan harus menghadapi kenyataan."
+                ]
+            },
+            {
+                question: "Apa yang paling kamu hargai dalam hidup?",
+                emoji: "💖",
+                answers: ["Keluarga", "Teman", "Karir"],
+                result: [
+                    "Keluarga adalah prioritas utama dalam hidupmu. Kamu sangat menghargai kedekatan dengan orang-orang terdekat.",
+                    "Teman-teman adalah sumber kebahagiaanmu. Kamu percaya bahwa hidup lebih berarti dengan pertemanan yang baik.",
+                    "Karir adalah hal yang paling penting bagimu. Kamu sangat ambisius dan ingin mencapai tujuan hidup melalui pekerjaan."
+                ]
+            },
+            {
+                question: "Saat menghadapi tekanan, apa yang kamu lakukan?",
+                emoji: "😰",
+                answers: ["Berbicara dengan seseorang", "Berlatih meditasi", "Bekerja lebih keras"],
+                result: [
+                    "Kamu adalah orang yang mencari dukungan sosial ketika merasa tertekan. Kamu percaya pada kekuatan percakapan.",
+                    "Kamu mengandalkan ketenangan batin untuk mengatasi tekanan. Meditasi adalah cara kamu untuk menjaga keseimbangan.",
+                    "Kamu cenderung bekerja lebih keras ketika menghadapi tekanan. Kamu merasa lebih produktif dan kuat melalui tantangan."
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = -1;
+        let totalScore = [0, 0, 0]; // Menyimpan skor untuk tiga pilihan: Tidur, Berjalan-jalan, Menonton Film, dll
+
+        function askQuestion() {
+            currentQuestionIndex++;
+
+            // Jika sudah sampai pertanyaan terakhir, tampilkan hasilnya
+            if (currentQuestionIndex >= questions.length) {
+                const highestScore = Math.max(...totalScore);
+                const resultIndex = totalScore.indexOf(highestScore);
+
+                // Tampilkan hasil berdasarkan skor tertinggi
+                document.getElementById("result").innerText = getResultText(resultIndex);
+                document.getElementById("emoji").innerText = getEmoji(resultIndex);
+                document.getElementById("question").innerText = "Terima kasih telah bermain!";
+                document.getElementById("answers").innerHTML = '';
+                document.getElementById("reset-btn").style.display = "block"; // Tampilkan tombol reset
+                return;
+            }
+
+            // Ambil pertanyaan dan jawabannya
+            const question = questions[currentQuestionIndex];
+            document.getElementById("emoji").innerText = question.emoji;
+            document.getElementById("question").innerText = question.question;
+
+            // Buat tombol jawaban
+            const answersDiv = document.getElementById("answers");
+            answersDiv.innerHTML = ''; // Clear jawaban sebelumnya
+            question.answers.forEach((answer, index) => {
+                const answerBtn = document.createElement("button");
+                answerBtn.className = "answer-btn";
+                answerBtn.innerText = answer;
+                answerBtn.onclick = () => handleAnswer(index);
+                answersDiv.appendChild(answerBtn);
+            });
+        }
+
+        function handleAnswer(answerIndex) {
+            const question = questions[currentQuestionIndex];
+            // Tambahkan skor berdasarkan jawaban yang dipilih
+            totalScore[answerIndex]++;
+            // Lanjutkan ke pertanyaan berikutnya
+            setTimeout(askQuestion, 1000);
+        }
+
+        function getResultText(index) {
+            switch (index) {
+                case 0:
+                    return "Kamu adalah orang yang suka ketenangan, sering membutuhkan waktu sendiri untuk mereset diri.";
+                case 1:
+                    return "Kamu adalah petualang, lebih suka mencari cara baru untuk mengatasi masalah dan menikmati hidup.";
+                case 2:
+                    return "Kamu adalah pekerja keras, yang selalu fokus pada tujuan dan ambisi untuk sukses.";
+                default:
+                    return "Terima kasih telah bermain! Kamu unik dan istimewa.";
+            }
+        }
+
+        function getEmoji(index) {
+            switch (index) {
+                case 0:
+                    return "🌿"; // Emoji untuk orang yang suka ketenangan
+                case 1:
+                    return "🌍"; // Emoji untuk orang yang suka petualangan
+                case 2:
+                    return "💼"; // Emoji untuk orang yang pekerja keras
+                default:
+                    return "🎉"; // Emoji umum
+            }
+        }
+
+        function resetGame() {
+            currentQuestionIndex = -1;
+            totalScore = [0, 0, 0];
+            document.getElementById("result").innerText = '';
+            document.getElementById("reset-btn").style.display = "none";
+            askQuestion();
+        }
+
+    </script>
+
+</body>
+</html>
